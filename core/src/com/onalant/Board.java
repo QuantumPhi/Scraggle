@@ -1,9 +1,9 @@
 package com.onalant;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,6 +13,8 @@ import java.net.URL;
 
 public class Board {
     public static final String API_URL = "API_URL";
+    public static final Color INACTIVE = new Color(0, 128, 128, 255);
+    public static final Color ACTIVE = new Color(255, 255, 255, 255);
 
     public Tile[][] values;
 
@@ -45,32 +47,57 @@ public class Board {
         for(int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 values[i][j] = new Tile(board.charAt(i * 4 + j));
-                values[i][j].tile.setRegionWidth((int)(0.75f * values[i][j].tile.getWidth()));
-                values[i][j].tile.setRegionHeight((int)(0.75f * values[i][j].tile.getHeight()));
+                values[i][j].x = 356 + 255 * i;
+                values[i][j].y = 30 + 255 * j;
             }
         }
     }
 
-    public void render(SpriteBatch batch) {
-        for(int i = 0; i < values.length; i++)
-            for(int j = 0; j < values[0].length; j++)
-                batch.draw(values[i][j].tile, 90+215*i, 90+215*j);
+    public void render(ShapeRenderer renderer) {
+        renderer.begin(ShapeRenderer.ShapeType.Filled);
+        for(int i = 0; i < values.length; i++) {
+            for (int j = 0; j < values[0].length; j++) {
+                renderer.setColor(values[i][j].isActive ? ACTIVE : INACTIVE);
+                renderer.rect(values[i][j].x, values[i][j].y, values[i][j].width, values[i][j].height);
+            }
+        }
+        renderer.end();
     }
 
     public Tile onTile(int x, int y) {
+        for(int i = 0; i < 4; i++)
+            for(int j = 0; j < 4; j++)
+                if(values[i][j].onTile(x, y))
+                    return values[i][3-j];
         return null;
     }
 
+    public void reset() {
+        for(int i = 0; i < 4; i++)
+            for(int j = 0; j < 4; j++)
+                values[i][j].isActive = false;
+    }
+
     public static class Tile {
-        public Sprite tile = new Sprite(new Texture("tile.png"));
+        public static String current = "";
+
+        public Rectangle tile = new Rectangle();
+        public boolean preliminary;
+        public boolean isActive;
+        public boolean wrong;
 
         public char c;
 
-        public int x;
-        public int y;
+        public int x, y,
+                width = 240,
+                height = 240;
 
         public Tile(char c) {
             this.c = c;
+        }
+
+        public boolean onTile(int x, int y) {
+            return Math.hypot(this.x - x + 120, this.y - y + 120) <= 120;
         }
     }
 }
