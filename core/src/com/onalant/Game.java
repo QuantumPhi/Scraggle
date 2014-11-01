@@ -20,7 +20,7 @@ public class Game extends ApplicationAdapter {
 	SpriteBatch batch;
     ShapeRenderer renderer;
 	Board board;
-    List<String> words;
+    List<String> words = new ArrayList<String>();
 	
 	@Override
 	public void create() {
@@ -56,6 +56,7 @@ public class Game extends ApplicationAdapter {
 
             @Override
             public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+                board.resetWrong();
                 Board.Tile tile = board.onTile(screenX, screenY);
                 if(tile != null) {
                     Board.Tile.current += tile.c;
@@ -71,8 +72,11 @@ public class Game extends ApplicationAdapter {
                     for (int j = 0; j < 4; j++)
                         if (board.values[i][j].isActive)
                             if(index < 1)
-                                board.values[i][j].wrong = true;
+                                board.values[i][j].wrong = 2;
+                            else
+                                board.values[i][j].wrong = 1;
                 board.reset();
+                Board.Tile.current = "";
                 return true;
             }
 

@@ -15,6 +15,8 @@ public class Board {
     public static final String API_URL = "API_URL";
     public static final Color INACTIVE = new Color(0, 128, 128, 255);
     public static final Color ACTIVE = new Color(255, 255, 255, 255);
+    public static final Color RIGHT = new Color(46, 204, 113, 255);
+    public static final Color WRONG = new Color(231, 76, 60, 255);
 
     public Tile[][] values;
 
@@ -78,13 +80,20 @@ public class Board {
                 values[i][j].isActive = false;
     }
 
+    public void resetWrong() {
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                values[i][j].wrong = 0;
+    }
+
     public static class Tile {
         public static String current = "";
 
         public Rectangle tile = new Rectangle();
-        public boolean preliminary;
-        public boolean isActive;
-        public boolean wrong;
+        public boolean preliminary, isActive;
+
+        //0 -> neutral; 1 -> right; 2 -> wrong
+        public int wrong;
 
         public char c;
 
